@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import { Upload, CheckCircle, AlertCircle, FileText, ArrowRight, RefreshCw } from "lucide-react";
+import { Upload, CheckCircle, AlertCircle, ArrowRight, RefreshCw } from "lucide-react";
 
 interface ColumnMapping {
   firstName?: string;
@@ -51,16 +51,13 @@ export default function ImportPage() {
     setFile(f);
     setError(null);
     setLoading(true);
-
     try {
       const fd = new FormData();
       fd.append("file", f);
       const res = await fetch("/api/import", { method: "POST", body: fd });
       const data = await res.json();
-
       if (data.needsMapping) {
         setHeaders(data.headers);
-        // Auto-guess mapping from header names
         const autoMap: ColumnMapping = {};
         const normalize = (s: string) => s.toLowerCase().replace(/[^a-z]/g, "");
         for (const h of data.headers) {
@@ -122,51 +119,53 @@ export default function ImportPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 pt-16">
-      <div className="max-w-2xl mx-auto px-4 py-10">
-        <h1 className="text-2xl font-bold text-white mb-1">Import Contacts</h1>
-        <p className="text-gray-400 text-sm mb-8">
-          Upload a CSV file — LinkedIn data export is auto-detected and imported directly.
-          For other files, you&apos;ll map the columns.
-        </p>
+    <div className="min-h-screen bg-background pt-12">
+      <div className="max-w-xl mx-auto px-6 py-10">
+        {/* Header */}
+        <div className="border-b border-border pb-6 mb-8">
+          <h1 className="font-serif text-3xl text-foreground">Import Contacts</h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            Upload a CSV — LinkedIn exports are auto-detected.
+          </p>
+        </div>
 
-        {/* Stage: Upload */}
+        {/* Upload stage */}
         {stage === "upload" && (
-          <div>
+          <div className="space-y-4">
             <div
               {...getRootProps()}
-              className={`border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-colors ${
+              className={`border border-dashed rounded-lg p-12 text-center cursor-pointer transition-colors ${
                 isDragActive
-                  ? "border-blue-400 bg-blue-900/10"
-                  : "border-gray-600 bg-gray-800/30 hover:border-gray-400"
+                  ? "border-primary/60 bg-primary/5"
+                  : "border-border hover:border-border/80 hover:bg-secondary/30"
               }`}
             >
               <input {...getInputProps()} />
-              <Upload className="w-10 h-10 text-gray-500 mx-auto mb-3" />
+              <Upload className="w-8 h-8 text-muted-foreground/40 mx-auto mb-3" strokeWidth={1} />
               {loading ? (
-                <p className="text-gray-300 animate-pulse">Analysing file...</p>
+                <p className="text-muted-foreground text-sm animate-pulse">Analysing…</p>
               ) : isDragActive ? (
-                <p className="text-blue-300">Drop the file here</p>
+                <p className="text-primary text-sm">Drop to upload</p>
               ) : (
                 <>
-                  <p className="text-gray-300 font-medium">Drag & drop a CSV file</p>
-                  <p className="text-gray-500 text-sm mt-1">or click to browse</p>
+                  <p className="text-foreground text-sm font-medium">Drop a CSV file here</p>
+                  <p className="text-muted-foreground text-xs mt-1">or click to browse</p>
                 </>
               )}
             </div>
 
-            <div className="mt-6 p-4 bg-gray-800/40 border border-gray-700 rounded-lg">
-              <h3 className="text-sm font-medium text-gray-300 flex items-center gap-2 mb-2">
-                <FileText className="w-4 h-4" /> Supported formats
-              </h3>
-              <ul className="text-sm text-gray-500 space-y-1">
-                <li>• <strong className="text-gray-400">LinkedIn export</strong> — download from LinkedIn Settings → Data Privacy → Get a copy of your data → Connections</li>
-                <li>• <strong className="text-gray-400">Generic CSV</strong> — any spreadsheet export; you&apos;ll map columns in the next step</li>
-              </ul>
+            <div className="card p-4 space-y-1.5">
+              <p className="section-label mb-2">Supported formats</p>
+              <p className="text-muted-foreground text-xs">
+                <span className="text-foreground">LinkedIn export</span> — Settings → Data Privacy → Get a copy → Connections
+              </p>
+              <p className="text-muted-foreground text-xs">
+                <span className="text-foreground">Generic CSV</span> — any spreadsheet; columns mapped in the next step
+              </p>
             </div>
 
             {error && (
-              <div className="mt-4 flex items-center gap-2 text-red-400 text-sm p-3 bg-red-900/20 border border-red-500/30 rounded-lg">
+              <div className="flex items-center gap-2 text-destructive text-sm p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 {error}
               </div>
@@ -174,104 +173,92 @@ export default function ImportPage() {
           </div>
         )}
 
-        {/* Stage: Column mapping */}
+        {/* Mapping stage */}
         {stage === "mapping" && (
-          <div>
-            <div className="flex items-center gap-2 mb-4 text-sm text-gray-400">
-              <FileText className="w-4 h-4" />
-              <span className="font-medium text-white">{file?.name}</span>
-              <span>— {headers.length} columns detected</span>
+          <div className="space-y-6">
+            <div className="flex items-center gap-2">
+              <p className="text-muted-foreground text-sm">
+                <span className="text-foreground">{file?.name}</span> · {headers.length} columns
+              </p>
             </div>
 
-            <p className="text-gray-400 text-sm mb-4">
-              Map your CSV columns to contact fields. Auto-guessed where possible.
-            </p>
-
-            <div className="space-y-3">
-              {FIELD_LABELS.map(({ key, label, required }) => (
-                <div key={key} className="flex items-center gap-3">
-                  <div className="w-32 text-sm text-gray-400 flex-shrink-0">
-                    {label}
-                    {required && <span className="text-red-400 ml-0.5">*</span>}
+            <div className="card overflow-hidden">
+              <div className="divide-y divide-border/50">
+                {FIELD_LABELS.map(({ key, label, required }) => (
+                  <div key={key} className="flex items-center gap-3 px-4 py-2.5">
+                    <div className="w-28 flex-shrink-0">
+                      <span className="text-xs text-foreground">{label}</span>
+                      {required && <span className="text-primary ml-0.5 text-xs">*</span>}
+                    </div>
+                    <ArrowRight className="w-3.5 h-3.5 text-muted-foreground/30 flex-shrink-0" />
+                    <select
+                      value={mapping[key] ?? ""}
+                      onChange={(e) => setMapping((m) => ({ ...m, [key]: e.target.value || undefined }))}
+                      className="flex-1 field-input py-1.5 text-xs"
+                    >
+                      <option value="">— skip —</option>
+                      {headers.map((h) => (
+                        <option key={h} value={h}>{h}</option>
+                      ))}
+                    </select>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-gray-600 flex-shrink-0" />
-                  <select
-                    value={mapping[key] ?? ""}
-                    onChange={(e) => setMapping((m) => ({ ...m, [key]: e.target.value || undefined }))}
-                    className="flex-1 px-3 py-1.5 bg-gray-800 border border-gray-600 rounded text-white text-sm"
-                  >
-                    <option value="">— skip —</option>
-                    {headers.map((h) => (
-                      <option key={h} value={h}>{h}</option>
-                    ))}
-                  </select>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
 
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={reset}
-                className="px-4 py-2 text-sm text-gray-400 hover:text-white border border-gray-600 rounded-lg transition-colors"
-              >
+            <div className="flex gap-3">
+              <button onClick={reset} className="btn-outline">
                 ← Start over
               </button>
               <button
                 onClick={handleSubmitMapping}
                 disabled={loading || !mapping.firstName}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm rounded-lg font-medium transition-colors"
+                className="btn-primary flex-1"
               >
-                {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : null}
+                {loading && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
                 Import Contacts
               </button>
             </div>
           </div>
         )}
 
-        {/* Stage: Result */}
+        {/* Result stage */}
         {stage === "result" && result && (
-          <div className="text-center">
-            <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
-            <h2 className="text-white text-xl font-bold mb-1">Import complete</h2>
-            <p className="text-gray-400 text-sm mb-6">
-              Your contacts have been added to the network.
-            </p>
+          <div className="text-center space-y-6">
+            <div>
+              <CheckCircle className="w-10 h-10 text-primary mx-auto mb-3" strokeWidth={1.5} />
+              <h2 className="font-serif text-2xl text-foreground">Import complete</h2>
+              <p className="text-muted-foreground text-sm mt-1">Your contacts have been added.</p>
+            </div>
 
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="bg-green-900/20 border border-green-500/30 rounded-xl p-4">
-                <div className="text-2xl font-bold text-green-400">{result.imported}</div>
-                <div className="text-xs text-gray-400">Imported</div>
+            <div className="grid grid-cols-3 gap-px bg-border rounded-lg overflow-hidden">
+              <div className="bg-card px-4 py-5">
+                <div className="font-serif text-3xl text-foreground">{result.imported}</div>
+                <div className="section-label mt-1">Imported</div>
               </div>
-              <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-4">
-                <div className="text-2xl font-bold text-gray-300">{result.skipped}</div>
-                <div className="text-xs text-gray-400">Skipped (duplicates)</div>
+              <div className="bg-card px-4 py-5">
+                <div className="font-serif text-3xl text-foreground">{result.skipped}</div>
+                <div className="section-label mt-1">Duplicates</div>
               </div>
-              <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-4">
-                <div className="text-2xl font-bold text-red-400">{result.errors.length}</div>
-                <div className="text-xs text-gray-400">Errors</div>
+              <div className="bg-card px-4 py-5">
+                <div className="font-serif text-3xl text-foreground">{result.errors.length}</div>
+                <div className="section-label mt-1">Errors</div>
               </div>
             </div>
 
             {result.errors.length > 0 && (
-              <div className="text-left mb-6 p-3 bg-red-900/20 border border-red-500/30 rounded-lg">
-                <p className="text-red-400 text-xs font-medium mb-1">Errors:</p>
+              <div className="text-left p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
                 {result.errors.slice(0, 5).map((e, i) => (
-                  <p key={i} className="text-red-400/70 text-xs">{e}</p>
+                  <p key={i} className="text-destructive/80 text-xs">{e}</p>
                 ))}
               </div>
             )}
 
             <div className="flex gap-3 justify-center">
-              <button
-                onClick={reset}
-                className="px-4 py-2 text-sm border border-gray-600 text-gray-300 hover:text-white rounded-lg transition-colors"
-              >
-                Import another file
+              <button onClick={reset} className="btn-outline">
+                Import another
               </button>
-              <a
-                href="/"
-                className="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
-              >
+              <a href="/" className="btn-primary">
                 View on Globe
               </a>
             </div>

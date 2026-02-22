@@ -28,18 +28,21 @@ export default function RecentContacts() {
   }, []);
 
   return (
-    <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-4">
-      <h3 className="text-sm font-medium text-gray-300 mb-2">10 Most Recent</h3>
+    <div className="card overflow-hidden">
+      <div className="px-5 py-4 border-b border-border">
+        <p className="section-label">Recent Contacts</p>
+      </div>
+
       {loading ? (
-        <div className="space-y-2">
+        <div className="p-4 space-y-2">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-12 bg-gray-700/40 rounded-lg animate-pulse" />
+            <div key={i} className="h-10 bg-secondary/50 rounded animate-pulse" />
           ))}
         </div>
       ) : contacts.length === 0 ? (
-        <p className="text-gray-500 text-sm py-4 text-center">No contacts yet.</p>
+        <p className="text-muted-foreground text-sm py-8 text-center">No contacts yet.</p>
       ) : (
-        <div>
+        <div className="divide-y divide-border/50">
           {contacts.map((c) => (
             <ContactCard
               key={c.id}

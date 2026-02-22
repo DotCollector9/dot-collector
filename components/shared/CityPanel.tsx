@@ -24,23 +24,26 @@ interface CityPanelProps {
 
 export default function CityPanel({ city, onClose }: CityPanelProps) {
   return (
-    <div className="absolute top-0 right-0 h-full w-80 bg-gray-900/95 backdrop-blur border-l border-gray-700 shadow-2xl flex flex-col z-20 animate-in slide-in-from-right">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
+    <div className="absolute top-0 right-0 h-full w-72 bg-card/95 backdrop-blur-md border-l border-border shadow-2xl flex flex-col z-20 animate-in slide-in-from-right duration-200">
+      {/* Header */}
+      <div className="flex items-start justify-between px-5 py-4 border-b border-border">
         <div>
-          <h2 className="text-white font-semibold text-base">{city.city}</h2>
-          <p className="text-gray-400 text-xs">
+          <h2 className="font-serif text-lg text-foreground leading-tight">{city.city}</h2>
+          <p className="section-label mt-0.5">
             {city.count} connection{city.count !== 1 ? "s" : ""}
             {city.country ? ` · ${city.country}` : ""}
           </p>
         </div>
         <button
           onClick={onClose}
-          className="text-gray-400 hover:text-white transition-colors p-1"
+          className="text-muted-foreground hover:text-foreground transition-colors mt-0.5"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
       </div>
-      <div className="flex-1 overflow-y-auto py-2">
+
+      {/* Contacts list */}
+      <div className="flex-1 overflow-y-auto py-1">
         {city.contacts.map((c) => (
           <ContactCard
             key={c.id}

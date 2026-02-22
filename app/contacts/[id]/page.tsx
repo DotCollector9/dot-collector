@@ -13,8 +13,8 @@ import {
   Edit3,
   Check,
   X,
-  Bell,
   Trash2,
+  Plus,
 } from "lucide-react";
 import InteractionTimeline from "@/components/Contacts/InteractionTimeline";
 import { format } from "date-fns";
@@ -72,9 +72,7 @@ export default function ContactPage() {
       .catch(() => setLoading(false));
   }, [id]);
 
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
+  useEffect(() => { refresh(); }, [refresh]);
 
   const startEdit = (field: string, value: string) => {
     setEditing(field);
@@ -120,18 +118,20 @@ export default function ContactPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-950 pt-16 flex items-center justify-center">
-        <div className="text-gray-400 animate-pulse">Loading...</div>
+      <div className="min-h-screen bg-background pt-12 flex items-center justify-center">
+        <div className="text-muted-foreground text-sm animate-pulse">Loading…</div>
       </div>
     );
   }
 
   if (!contact) {
     return (
-      <div className="min-h-screen bg-gray-950 pt-16 flex items-center justify-center">
+      <div className="min-h-screen bg-background pt-12 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-300 mb-4">Contact not found.</p>
-          <Link href="/dashboard" className="text-blue-400 hover:underline">← Dashboard</Link>
+          <p className="text-foreground mb-3">Contact not found.</p>
+          <Link href="/dashboard" className="text-primary text-sm hover:underline">
+            ← Dashboard
+          </Link>
         </div>
       </div>
     );
@@ -150,10 +150,10 @@ export default function ContactPage() {
   }) => {
     const value = contact[field] as string | null;
     return (
-      <div className="flex items-start gap-2 group">
-        {Icon && <Icon className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />}
+      <div className="flex items-start gap-2.5 group py-1.5">
+        {Icon && <Icon className="w-3.5 h-3.5 text-muted-foreground/50 mt-0.5 flex-shrink-0" />}
         {editing === field ? (
-          <div className="flex items-center gap-1 flex-1">
+          <div className="flex items-center gap-1.5 flex-1">
             <input
               autoFocus
               value={editValue}
@@ -162,25 +162,31 @@ export default function ContactPage() {
                 if (e.key === "Enter") saveEdit(field);
                 if (e.key === "Escape") setEditing(null);
               }}
-              className="flex-1 px-2 py-0.5 bg-gray-800 border border-blue-500 rounded text-white text-sm"
+              className="flex-1 px-2 py-0.5 bg-input border border-ring rounded text-foreground text-sm focus:outline-none"
             />
-            <button onClick={() => saveEdit(field)} className="text-green-400 hover:text-green-300"><Check className="w-3.5 h-3.5" /></button>
-            <button onClick={() => setEditing(null)} className="text-gray-500 hover:text-gray-300"><X className="w-3.5 h-3.5" /></button>
+            <button onClick={() => saveEdit(field)} className="text-primary hover:opacity-70">
+              <Check className="w-3.5 h-3.5" />
+            </button>
+            <button onClick={() => setEditing(null)} className="text-muted-foreground hover:text-foreground">
+              <X className="w-3.5 h-3.5" />
+            </button>
           </div>
         ) : (
-          <div className="flex items-center gap-1 flex-1">
+          <div className="flex items-center gap-1.5 flex-1 min-w-0">
             {value ? (
               href ? (
-                <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline text-sm">{value}</a>
+                <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-sm truncate">
+                  {value}
+                </a>
               ) : (
-                <span className="text-gray-200 text-sm">{value}</span>
+                <span className="text-foreground text-sm truncate">{value}</span>
               )
             ) : (
-              <span className="text-gray-600 text-sm italic">Add {label.toLowerCase()}</span>
+              <span className="text-muted-foreground/40 text-sm italic">Add {label.toLowerCase()}</span>
             )}
             <button
               onClick={() => startEdit(field, value ?? "")}
-              className="opacity-0 group-hover:opacity-100 ml-1 text-gray-600 hover:text-gray-300 transition-all"
+              className="opacity-0 group-hover:opacity-100 ml-auto flex-shrink-0 text-muted-foreground/40 hover:text-muted-foreground transition-all"
             >
               <Edit3 className="w-3 h-3" />
             </button>
@@ -191,39 +197,42 @@ export default function ContactPage() {
   };
 
   const initials = `${contact.firstName[0] ?? ""}${contact.lastName[0] ?? ""}`.toUpperCase();
+  const activeReminders = contact.reminders.filter((r) => !r.isCompleted);
 
   return (
-    <div className="min-h-screen bg-gray-950 pt-16">
-      <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background pt-12">
+      <div className="max-w-5xl mx-auto px-6 py-8">
+        {/* Back */}
         <Link
           href="/dashboard"
-          className="flex items-center gap-1 text-gray-400 hover:text-white text-sm mb-6 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors mb-8"
         >
-          <ArrowLeft className="w-4 h-4" /> Back
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Dashboard
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left: contact details */}
+          {/* Left sidebar */}
           <div className="lg:col-span-1 space-y-4">
-            {/* Header */}
-            <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-5">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 rounded-full bg-blue-600/30 border-2 border-blue-500/40 flex items-center justify-center text-blue-200 font-bold text-xl flex-shrink-0 overflow-hidden">
+            {/* Profile card */}
+            <div className="card p-5">
+              {/* Avatar + name */}
+              <div className="flex items-center gap-4 mb-5">
+                <div className="w-14 h-14 rounded-full bg-secondary border border-border flex items-center justify-center text-primary font-medium text-lg flex-shrink-0 overflow-hidden">
                   {contact.avatarUrl ? (
                     <img src={contact.avatarUrl} alt="" className="w-full h-full object-cover" />
                   ) : initials}
                 </div>
-                <div>
-                  <h1 className="text-white font-bold text-xl">
+                <div className="min-w-0">
+                  <h1 className="font-serif text-xl text-foreground truncate">
                     {contact.firstName} {contact.lastName}
                   </h1>
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-400 capitalize">
-                    {contact.source}
-                  </span>
+                  <span className="section-label">{contact.source}</span>
                 </div>
               </div>
 
-              <div className="space-y-2.5">
+              {/* Fields */}
+              <div className="divide-y divide-border/50">
                 <EditableField field="jobTitle" label="Job Title" icon={Building2} />
                 <EditableField field="company" label="Company" icon={Building2} />
                 <EditableField field="email" label="Email" icon={Mail} href={contact.email ? `mailto:${contact.email}` : undefined} />
@@ -233,83 +242,88 @@ export default function ContactPage() {
                 <EditableField field="linkedinUrl" label="LinkedIn" icon={Linkedin} href={contact.linkedinUrl ?? undefined} />
               </div>
 
-              <div className="mt-4 pt-4 border-t border-gray-700">
+              {/* Notes */}
+              <div className="mt-4 pt-4 border-t border-border">
+                <p className="section-label mb-1.5">Notes</p>
                 <EditableField field="notes" label="Notes" />
               </div>
 
-              <div className="mt-4 text-xs text-gray-600 space-y-0.5">
-                <p>Added {format(new Date(contact.createdAt), "d MMM yyyy")}</p>
-                <p>Updated {format(new Date(contact.updatedAt), "d MMM yyyy")}</p>
+              {/* Meta */}
+              <div className="mt-4 pt-4 border-t border-border space-y-0.5">
+                <p className="text-[10px] text-muted-foreground/50">
+                  Added {format(new Date(contact.createdAt), "d MMM yyyy")}
+                </p>
+                <p className="text-[10px] text-muted-foreground/50">
+                  Updated {format(new Date(contact.updatedAt), "d MMM yyyy")}
+                </p>
               </div>
 
+              {/* Delete */}
               <button
                 onClick={handleDelete}
-                className="mt-4 w-full flex items-center justify-center gap-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-900/20 px-3 py-2 rounded-md transition-colors"
+                className="mt-4 w-full flex items-center justify-center gap-1.5 text-xs text-muted-foreground/50 hover:text-destructive transition-colors py-1.5"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-3.5 h-3.5" />
                 Delete contact
               </button>
             </div>
 
             {/* Reminders */}
-            <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-medium text-white flex items-center gap-2">
-                  <Bell className="w-4 h-4 text-yellow-400" />
-                  Reminders
-                </h3>
+            <div className="card overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
+                <p className="section-label">Reminders</p>
                 <button
                   onClick={() => setShowReminderForm(!showReminderForm)}
-                  className="text-xs text-blue-400 hover:text-blue-300"
+                  className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  + Add
+                  <Plus className="w-3.5 h-3.5" />
                 </button>
               </div>
 
               {showReminderForm && (
-                <form onSubmit={addReminder} className="mb-3 space-y-2">
+                <form onSubmit={addReminder} className="p-4 border-b border-border space-y-2.5">
                   <input
                     type="text"
-                    placeholder="Reminder message"
+                    placeholder="Reminder note"
                     value={reminderForm.message}
                     onChange={(e) => setReminderForm((f) => ({ ...f, message: e.target.value }))}
                     required
-                    className="w-full px-2 py-1.5 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                    className="field-input"
                   />
                   <input
                     type="date"
                     value={reminderForm.dueDate}
                     onChange={(e) => setReminderForm((f) => ({ ...f, dueDate: e.target.value }))}
                     required
-                    className="w-full px-2 py-1.5 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                    className="field-input"
                   />
                   <div className="flex gap-2">
-                    <button type="submit" className="flex-1 text-sm bg-blue-600 hover:bg-blue-700 text-white py-1.5 rounded">Save</button>
-                    <button type="button" onClick={() => setShowReminderForm(false)} className="flex-1 text-sm text-gray-400 hover:text-white">Cancel</button>
+                    <button type="submit" className="btn-primary flex-1 text-xs py-1.5">Save</button>
+                    <button type="button" onClick={() => setShowReminderForm(false)} className="btn-ghost flex-1 text-xs py-1.5">Cancel</button>
                   </div>
                 </form>
               )}
 
-              {contact.reminders.filter((r) => !r.isCompleted).length === 0 ? (
-                <p className="text-gray-600 text-xs">No active reminders.</p>
+              {activeReminders.length === 0 ? (
+                <p className="text-muted-foreground/50 text-xs px-5 py-4">No active reminders.</p>
               ) : (
-                <div className="space-y-2">
-                  {contact.reminders
-                    .filter((r) => !r.isCompleted)
-                    .map((r) => (
-                      <div key={r.id} className="flex items-start gap-2 text-sm">
-                        <div className="flex-1">
-                          <p className="text-gray-200">{r.message}</p>
-                          <p className="text-yellow-400/70 text-xs">{format(new Date(r.dueDate), "d MMM yyyy")}</p>
-                        </div>
-                        <button
-                          onClick={() => completeReminder(r.id)}
-                          className="text-gray-500 hover:text-green-400 mt-0.5"
-                        >
-                          <Check className="w-4 h-4" />
-                        </button>
+                <div className="divide-y divide-border/50">
+                  {activeReminders.map((r) => (
+                    <div key={r.id} className="flex items-start gap-3 px-5 py-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-foreground text-sm">{r.message}</p>
+                        <p className="text-primary/70 text-xs mt-0.5">
+                          {format(new Date(r.dueDate), "d MMM yyyy")}
+                        </p>
                       </div>
-                    ))}
+                      <button
+                        onClick={() => completeReminder(r.id)}
+                        className="flex-shrink-0 w-6 h-6 rounded-full border border-border hover:border-primary/50 hover:text-primary text-muted-foreground/40 flex items-center justify-center transition-colors mt-0.5"
+                      >
+                        <Check className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
@@ -317,7 +331,7 @@ export default function ContactPage() {
 
           {/* Right: timeline */}
           <div className="lg:col-span-2">
-            <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-5">
+            <div className="card p-6">
               <InteractionTimeline
                 contactId={id}
                 interactions={contact.interactions}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { RefreshCw, CheckCircle, AlertCircle, ExternalLink } from "lucide-react";
+import { RefreshCw, ExternalLink } from "lucide-react";
 
 interface SyncResult {
   contactsImported: number;
@@ -18,7 +18,6 @@ export default function SyncPage() {
     setLoading(true);
     setError(null);
     setResult(null);
-
     try {
       const res = await fetch("/api/sync/gmail");
       if (res.status === 401) {
@@ -26,11 +25,8 @@ export default function SyncPage() {
         return;
       }
       const data = await res.json();
-      if (data.error) {
-        setError(data.error);
-      } else {
-        setResult(data);
-      }
+      if (data.error) setError(data.error);
+      else setResult(data);
     } catch (err) {
       setError(String(err));
     } finally {
@@ -43,83 +39,84 @@ export default function SyncPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 pt-16">
-      <div className="max-w-lg mx-auto px-4 py-10">
-        <h1 className="text-2xl font-bold text-white mb-1">Gmail Sync</h1>
-        <p className="text-gray-400 text-sm mb-8">
-          Import your Google Contacts and log email interactions automatically.
-        </p>
+    <div className="min-h-screen bg-background pt-12">
+      <div className="max-w-md mx-auto px-6 py-10">
+        {/* Header */}
+        <div className="border-b border-border pb-6 mb-8">
+          <h1 className="font-serif text-3xl text-foreground">Gmail Sync</h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            Import Google Contacts and log email interactions automatically.
+          </p>
+        </div>
 
-        <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6 space-y-4">
-          <div className="space-y-2 text-sm text-gray-400">
-            <p className="font-medium text-gray-300">What gets synced:</p>
-            <ul className="space-y-1 pl-2">
-              <li>• Google Contacts → imported as new contacts (if not already present)</li>
-              <li>• Gmail emails → logged as interactions on matching contacts</li>
-            </ul>
+        <div className="space-y-6">
+          {/* What syncs */}
+          <div className="card p-5 space-y-3">
+            <p className="section-label">What gets synced</p>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <p>→ Google Contacts imported as new contacts</p>
+              <p>→ Gmail threads logged as interactions</p>
+            </div>
           </div>
 
-          <div className="p-3 bg-yellow-900/20 border border-yellow-500/30 rounded-lg text-xs text-yellow-300">
-            <strong>Setup required:</strong> Gmail sync needs a Google Cloud project with OAuth credentials.
-            See <code className="bg-yellow-900/30 px-1 rounded">.env.local.example</code> for instructions.
-            <a
-              href="https://console.cloud.google.com/apis/credentials"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 ml-1 underline"
-            >
-              Open Console <ExternalLink className="w-3 h-3" />
-            </a>
+          {/* Setup note */}
+          <div className="card p-4 border-primary/20">
+            <p className="text-xs text-muted-foreground">
+              <span className="text-foreground font-medium">Setup required.</span>{" "}
+              Gmail sync needs a Google Cloud project with OAuth credentials.{" "}
+              <a
+                href="https://console.cloud.google.com/apis/credentials"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-0.5 text-primary hover:underline"
+              >
+                Open Console <ExternalLink className="w-3 h-3" />
+              </a>
+            </p>
           </div>
 
+          {/* Actions */}
           <div className="flex gap-3">
-            <button
-              onClick={handleGoogleSignIn}
-              className="flex-1 px-4 py-2 text-sm border border-gray-600 text-gray-300 hover:text-white hover:border-gray-400 rounded-lg transition-colors"
-            >
+            <button onClick={handleGoogleSignIn} className="btn-outline flex-1">
               Sign in with Google
             </button>
-            <button
-              onClick={handleSync}
-              disabled={loading}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm rounded-lg font-medium transition-colors"
-            >
-              {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+            <button onClick={handleSync} disabled={loading} className="btn-primary flex-1">
+              {loading && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
               Sync Now
             </button>
           </div>
+
+          {/* Error */}
+          {error && (
+            <div className="text-destructive text-sm p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+              {error}
+            </div>
+          )}
+
+          {/* Result */}
+          {result && (
+            <div className="card overflow-hidden">
+              <div className="px-5 py-3.5 border-b border-border">
+                <p className="section-label">Sync complete</p>
+              </div>
+              <div className="grid grid-cols-2 gap-px bg-border">
+                <div className="bg-card px-5 py-5">
+                  <div className="font-serif text-3xl text-foreground">{result.contactsImported}</div>
+                  <div className="section-label mt-1">Contacts</div>
+                </div>
+                <div className="bg-card px-5 py-5">
+                  <div className="font-serif text-3xl text-foreground">{result.interactionsLogged}</div>
+                  <div className="section-label mt-1">Interactions</div>
+                </div>
+              </div>
+              {result.errors.length > 0 && (
+                <div className="px-5 py-3 text-xs text-muted-foreground space-y-0.5">
+                  {result.errors.slice(0, 3).map((e, i) => <p key={i}>{e}</p>)}
+                </div>
+              )}
+            </div>
+          )}
         </div>
-
-        {error && (
-          <div className="mt-4 flex items-start gap-2 text-red-400 text-sm p-4 bg-red-900/20 border border-red-500/30 rounded-xl">
-            <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-            <span>{error}</span>
-          </div>
-        )}
-
-        {result && (
-          <div className="mt-4 p-5 bg-green-900/20 border border-green-500/30 rounded-xl">
-            <div className="flex items-center gap-2 mb-3">
-              <CheckCircle className="w-5 h-5 text-green-400" />
-              <span className="text-white font-medium">Sync complete</span>
-            </div>
-            <div className="grid grid-cols-2 gap-3 text-center">
-              <div>
-                <div className="text-2xl font-bold text-green-400">{result.contactsImported}</div>
-                <div className="text-xs text-gray-400">Contacts imported</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-blue-400">{result.interactionsLogged}</div>
-                <div className="text-xs text-gray-400">Interactions logged</div>
-              </div>
-            </div>
-            {result.errors.length > 0 && (
-              <div className="mt-3 text-xs text-yellow-400">
-                {result.errors.slice(0, 3).map((e, i) => <p key={i}>{e}</p>)}
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );

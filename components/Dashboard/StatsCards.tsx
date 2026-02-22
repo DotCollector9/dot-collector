@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Users, MapPin, Building2, MessageSquare } from "lucide-react";
 
 interface Stats {
   totalContacts: number;
@@ -21,50 +20,23 @@ export default function StatsCards() {
   }, []);
 
   const cards = [
-    {
-      label: "Total Contacts",
-      value: stats?.totalContacts ?? "-",
-      icon: Users,
-      color: "text-blue-400",
-      bg: "bg-blue-500/10",
-    },
-    {
-      label: "Cities",
-      value: stats?.totalCities ?? "-",
-      icon: MapPin,
-      color: "text-green-400",
-      bg: "bg-green-500/10",
-    },
-    {
-      label: "Companies",
-      value: stats?.totalCompanies ?? "-",
-      icon: Building2,
-      color: "text-purple-400",
-      bg: "bg-purple-500/10",
-    },
-    {
-      label: "Interactions This Month",
-      value: stats?.interactionsThisMonth ?? "-",
-      icon: MessageSquare,
-      color: "text-orange-400",
-      bg: "bg-orange-500/10",
-    },
+    { label: "Contacts", value: stats?.totalContacts },
+    { label: "Cities", value: stats?.totalCities },
+    { label: "Companies", value: stats?.totalCompanies },
+    { label: "Interactions this month", value: stats?.interactionsThisMonth },
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      {cards.map(({ label, value, icon: Icon, color, bg }) => (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-border rounded-lg overflow-hidden">
+      {cards.map(({ label, value }) => (
         <div
           key={label}
-          className="bg-gray-800/50 border border-gray-700 rounded-xl p-4 flex items-center gap-4"
+          className="bg-card px-6 py-5 flex flex-col gap-1"
         >
-          <div className={`${bg} p-3 rounded-lg`}>
-            <Icon className={`w-6 h-6 ${color}`} />
+          <div className="font-serif text-4xl text-foreground tracking-tight leading-none">
+            {value ?? <span className="text-muted-foreground/40">—</span>}
           </div>
-          <div>
-            <div className="text-2xl font-bold text-white">{value}</div>
-            <div className="text-xs text-gray-400">{label}</div>
-          </div>
+          <div className="section-label mt-1">{label}</div>
         </div>
       ))}
     </div>

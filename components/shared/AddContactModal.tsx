@@ -25,27 +25,27 @@ export default function AddContactModal() {
       {/* FAB */}
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-105 active:scale-95"
+        className="fixed bottom-8 right-8 z-40 w-12 h-12 bg-primary hover:opacity-90 text-primary-foreground rounded-full shadow-xl flex items-center justify-center transition-opacity active:scale-95"
         aria-label="Add contact"
       >
-        <Plus className="w-7 h-7" />
+        <Plus className="w-5 h-5" strokeWidth={1.5} />
       </button>
 
-      {/* Modal overlay */}
+      {/* Modal */}
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-background/75 backdrop-blur-sm"
             onClick={() => setOpen(false)}
           />
-          <div className="relative w-full max-w-lg bg-gray-900 border border-gray-700 rounded-xl shadow-2xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-white font-semibold text-lg">Add Contact</h2>
+          <div className="relative w-full max-w-lg bg-card border border-border rounded-lg shadow-2xl p-6">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="font-serif text-xl text-foreground">Add Contact</h2>
               <button
                 onClick={() => setOpen(false)}
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-muted-foreground hover:text-foreground transition-colors"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
             <ContactForm

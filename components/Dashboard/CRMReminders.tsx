@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AlertCircle, MessageSquarePlus } from "lucide-react";
+import { Check } from "lucide-react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 
@@ -61,46 +61,47 @@ export default function CRMReminders() {
   return (
     <div className="space-y-4">
       {/* Stale contacts */}
-      <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <AlertCircle className="w-4 h-4 text-orange-400" />
-          <h3 className="text-sm font-medium text-gray-300">
-            No recent interaction{stale.length > 0 ? ` (${stale.length})` : ""}
-          </h3>
-          <span className="text-xs text-gray-500">— 3+ months ago</span>
+      <div className="card overflow-hidden">
+        <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+          <p className="section-label">Overdue — 3+ months</p>
+          {stale.length > 0 && (
+            <span className="text-[10px] tabular-nums text-muted-foreground">{stale.length}</span>
+          )}
         </div>
 
         {stale.length === 0 ? (
-          <p className="text-gray-500 text-sm py-2 text-center">All caught up!</p>
+          <p className="text-muted-foreground text-sm py-6 text-center">All caught up.</p>
         ) : (
-          <div className="space-y-2">
+          <div className="divide-y divide-border/50">
             {stale.map((c) => {
               const lastDate = c.interactions[0]?.date;
+              const initials = `${c.firstName[0]}${c.lastName[0]}`.toUpperCase();
               return (
-                <div
-                  key={c.id}
-                  className="flex items-center gap-3 p-2 rounded-lg bg-orange-500/5 border border-orange-500/15"
-                >
-                  <div className="w-8 h-8 rounded-full bg-orange-600/20 flex items-center justify-center text-orange-300 text-xs font-semibold flex-shrink-0">
-                    {c.firstName[0]}{c.lastName[0]}
+                <div key={c.id} className="flex items-center gap-3 px-5 py-3">
+                  <div className="w-8 h-8 rounded-full bg-secondary border border-border flex items-center justify-center text-primary text-xs font-medium flex-shrink-0">
+                    {initials}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <Link href={`/contacts/${c.id}`} className="text-white text-sm hover:text-blue-300 transition-colors font-medium">
+                    <Link
+                      href={`/contacts/${c.id}`}
+                      className="text-foreground text-sm hover:text-primary transition-colors"
+                    >
                       {c.firstName} {c.lastName}
                     </Link>
-                    {c.company && <p className="text-gray-500 text-xs truncate">{c.company}</p>}
-                    <p className="text-orange-400/70 text-xs">
+                    {c.company && (
+                      <p className="text-muted-foreground text-xs truncate">{c.company}</p>
+                    )}
+                    <p className="text-muted-foreground/60 text-xs">
                       {lastDate
-                        ? `Last contact ${formatDistanceToNow(new Date(lastDate), { addSuffix: true })}`
+                        ? formatDistanceToNow(new Date(lastDate), { addSuffix: true })
                         : "Never contacted"}
                     </p>
                   </div>
                   <button
                     onClick={() => logInteraction(c.id)}
                     disabled={logging === c.id}
-                    className="flex-shrink-0 flex items-center gap-1 px-2 py-1 bg-orange-600/20 hover:bg-orange-600/40 border border-orange-500/30 rounded-md text-orange-300 text-xs transition-colors disabled:opacity-50"
+                    className="flex-shrink-0 text-[10px] uppercase tracking-widest text-muted-foreground hover:text-primary border border-border hover:border-primary/40 px-2.5 py-1 rounded transition-colors disabled:opacity-40"
                   >
-                    <MessageSquarePlus className="w-3 h-3" />
                     Log
                   </button>
                 </div>
@@ -112,15 +113,17 @@ export default function CRMReminders() {
 
       {/* Upcoming reminders */}
       {reminders.length > 0 && (
-        <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-4">
-          <h3 className="text-sm font-medium text-gray-300 mb-3">Upcoming Reminders</h3>
-          <div className="space-y-2">
+        <div className="card overflow-hidden">
+          <div className="px-5 py-4 border-b border-border">
+            <p className="section-label">Reminders</p>
+          </div>
+          <div className="divide-y divide-border/50">
             {reminders.map((r) => (
-              <div key={r.id} className="flex items-center gap-3 p-2 rounded-lg bg-blue-500/5 border border-blue-500/15">
+              <div key={r.id} className="flex items-center gap-3 px-5 py-3">
                 <div className="flex-1 min-w-0">
-                  <p className="text-white text-sm font-medium">{r.message}</p>
-                  <p className="text-blue-400 text-xs">
-                    <Link href={`/contacts/${r.contact.id}`} className="hover:underline">
+                  <p className="text-foreground text-sm">{r.message}</p>
+                  <p className="text-muted-foreground text-xs mt-0.5">
+                    <Link href={`/contacts/${r.contact.id}`} className="hover:text-primary transition-colors">
                       {r.contact.firstName} {r.contact.lastName}
                     </Link>
                     {" · "}
@@ -129,9 +132,9 @@ export default function CRMReminders() {
                 </div>
                 <button
                   onClick={() => completeReminder(r.id)}
-                  className="flex-shrink-0 px-2 py-1 bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 rounded-md text-blue-300 text-xs transition-colors"
+                  className="flex-shrink-0 w-7 h-7 rounded-full border border-border hover:border-primary/50 hover:text-primary text-muted-foreground flex items-center justify-center transition-colors"
                 >
-                  Done
+                  <Check className="w-3 h-3" />
                 </button>
               </div>
             ))}

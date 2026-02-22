@@ -5,17 +5,18 @@ import CRMReminders from "@/components/Dashboard/CRMReminders";
 
 export default function DashboardPage() {
   return (
-    <div className="min-h-screen bg-gray-950 pt-16">
-      <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Network Dashboard</h1>
-          <p className="text-gray-400 text-sm mt-1">Your professional network at a glance</p>
+    <div className="min-h-screen bg-background pt-12">
+      <div className="max-w-7xl mx-auto px-6 py-10 space-y-8">
+        {/* Header */}
+        <div className="border-b border-border pb-6">
+          <h1 className="font-serif text-3xl text-foreground">Network Overview</h1>
+          <p className="text-muted-foreground text-sm mt-1">Your professional network at a glance</p>
         </div>
 
         <StatsCards />
         <NetworkCharts />
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <RecentContacts />
           <CRMReminders />
         </div>

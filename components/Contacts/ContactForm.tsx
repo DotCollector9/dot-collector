@@ -78,13 +78,15 @@ export default function ContactForm({
     placeholder?: string;
   }) => (
     <div>
-      <label className="block text-xs font-medium text-gray-400 mb-1">{label}</label>
+      <label className="block text-[10px] uppercase tracking-widest text-muted-foreground mb-1.5">
+        {label}
+      </label>
       <input
         type={type}
         value={form[field]}
         onChange={set(field)}
         placeholder={placeholder}
-        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-500"
+        className="field-input"
       />
     </div>
   );
@@ -107,32 +109,28 @@ export default function ContactForm({
       </div>
       <Field label="LinkedIn URL" field="linkedinUrl" placeholder="https://linkedin.com/in/..." />
       <div>
-        <label className="block text-xs font-medium text-gray-400 mb-1">Notes</label>
+        <label className="block text-[10px] uppercase tracking-widest text-muted-foreground mb-1.5">
+          Notes
+        </label>
         <textarea
           value={form.notes}
           onChange={set("notes")}
           rows={3}
           placeholder="Met at conference..."
-          className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-500 resize-none"
+          className="field-input resize-none"
         />
       </div>
-      {error && <p className="text-red-400 text-xs">{error}</p>}
-      <div className="flex justify-end gap-2 pt-1">
+
+      {error && <p className="text-destructive text-xs">{error}</p>}
+
+      <div className="flex justify-end gap-3 pt-2">
         {onCancel && (
-          <button
-            type="button"
-            onClick={onCancel}
-            className="px-4 py-2 text-sm text-gray-300 hover:text-white transition-colors"
-          >
+          <button type="button" onClick={onCancel} className="btn-ghost">
             Cancel
           </button>
         )}
-        <button
-          type="submit"
-          disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm rounded-md font-medium transition-colors"
-        >
-          {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+        <button type="submit" disabled={loading} className="btn-primary">
+          {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
           {submitLabel}
         </button>
       </div>

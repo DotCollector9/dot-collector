@@ -2,40 +2,47 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Globe, LayoutDashboard, Upload, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+const links = [
+  { href: "/", label: "Globe" },
+  { href: "/dashboard", label: "Dashboard" },
+  { href: "/import", label: "Import" },
+  { href: "/sync", label: "Sync" },
+];
 
 export default function NavBar() {
   const pathname = usePathname();
 
-  const links = [
-    { href: "/", label: "Globe", icon: Globe },
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/import", label: "Import", icon: Upload },
-    { href: "/sync", label: "Sync Gmail", icon: RefreshCw },
-  ];
-
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-3 bg-gray-900/90 backdrop-blur border-b border-gray-700">
-      <Link href="/" className="text-white font-bold text-lg tracking-tight">
-        dot<span className="text-blue-400">collector</span>
+    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 h-12 bg-background/80 backdrop-blur-md border-b border-border">
+      {/* Wordmark */}
+      <Link
+        href="/"
+        className="font-serif italic text-foreground text-lg tracking-tight leading-none select-none"
+      >
+        dot·collector
       </Link>
-      <div className="flex items-center gap-1">
-        {links.map(({ href, label, icon: Icon }) => (
-          <Link
-            key={href}
-            href={href}
-            className={cn(
-              "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
-              pathname === href
-                ? "bg-blue-600 text-white"
-                : "text-gray-300 hover:text-white hover:bg-gray-700"
-            )}
-          >
-            <Icon className="w-4 h-4" />
-            {label}
-          </Link>
-        ))}
+
+      {/* Nav links */}
+      <div className="flex items-center gap-6">
+        {links.map(({ href, label }) => {
+          const active = pathname === href;
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={cn(
+                "relative text-xs tracking-widest uppercase pb-px transition-colors",
+                active
+                  ? "text-foreground after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {label}
+            </Link>
+          );
+        })}
       </div>
     </nav>
   );

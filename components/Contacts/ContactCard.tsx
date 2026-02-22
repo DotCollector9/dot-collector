@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Building2, MapPin } from "lucide-react";
 
 interface ContactCardProps {
   id: string;
@@ -31,10 +30,10 @@ export default function ContactCard({
   return (
     <Link
       href={`/contacts/${id}`}
-      className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800/60 transition-colors group"
+      className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/60 transition-colors group"
     >
       {/* Avatar */}
-      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-600/30 border border-blue-500/30 flex items-center justify-center text-blue-300 font-semibold text-sm overflow-hidden">
+      <div className="flex-shrink-0 w-9 h-9 rounded-full bg-secondary border border-border flex items-center justify-center text-primary text-xs font-medium overflow-hidden">
         {avatarUrl ? (
           <img src={avatarUrl} alt={`${firstName} ${lastName}`} className="w-full h-full object-cover" />
         ) : (
@@ -45,38 +44,32 @@ export default function ContactCard({
       {/* Info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="text-white text-sm font-medium group-hover:text-blue-300 transition-colors truncate">
+          <span className="text-foreground text-sm font-medium group-hover:text-primary transition-colors truncate">
             {firstName} {lastName}
           </span>
           {badge}
         </div>
         {(jobTitle || company) && (
-          <div className="flex items-center gap-1 text-gray-400 text-xs truncate">
-            <Building2 className="w-3 h-3 flex-shrink-0" />
-            <span className="truncate">
-              {[jobTitle, company].filter(Boolean).join(" · ")}
-            </span>
-          </div>
+          <p className="text-muted-foreground text-xs truncate">
+            {[jobTitle, company].filter(Boolean).join(" · ")}
+          </p>
         )}
         {city && (
-          <div className="flex items-center gap-1 text-gray-500 text-xs">
-            <MapPin className="w-3 h-3 flex-shrink-0" />
-            <span>
-              {[city, country].filter(Boolean).join(", ")}
-            </span>
-          </div>
+          <p className="text-muted-foreground/60 text-xs truncate">
+            {[city, country].filter(Boolean).join(", ")}
+          </p>
         )}
       </div>
 
       {lastInteraction && (
         <div className="flex-shrink-0 text-right">
-          <div className="text-xs text-gray-500">
+          <div className="text-xs text-muted-foreground">
             {new Date(lastInteraction.date).toLocaleDateString("en-GB", {
               day: "numeric",
               month: "short",
             })}
           </div>
-          <div className="text-xs text-gray-600 capitalize">{lastInteraction.type}</div>
+          <div className="text-[10px] text-muted-foreground/60 capitalize">{lastInteraction.type}</div>
         </div>
       )}
     </Link>
