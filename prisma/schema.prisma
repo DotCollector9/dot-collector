@@ -1,0 +1,64 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Contact {
+  id          String   @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String?
+  phone       String?
+  company     String?
+  jobTitle    String?
+  city        String?
+  country     String?
+  latitude    Float?
+  longitude   Float?
+  linkedinUrl String?
+  linkedinId  String?  @unique
+  source      String   @default("manual")
+  tags        String   @default("[]")
+  notes       String?
+  avatarUrl   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  interactions Interaction[]
+  reminders    Reminder[]
+}
+
+model Interaction {
+  id        String   @id @default(cuid())
+  contactId String
+  type      String   @default("note")
+  date      DateTime @default(now())
+  notes     String?
+  createdAt DateTime @default(now())
+
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+}
+
+model Reminder {
+  id          String   @id @default(cuid())
+  contactId   String
+  dueDate     DateTime
+  message     String
+  isCompleted Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+}
+
+model GoogleToken {
+  id           String    @id @default(cuid())
+  accessToken  String
+  refreshToken String?
+  expiresAt    DateTime?
+  scope        String?
+  updatedAt    DateTime  @updatedAt
+}

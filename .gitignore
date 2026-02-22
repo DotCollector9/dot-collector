@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# Database (local data — don't commit)
+prisma/dev.db
+prisma/dev.db-journal
+
+# Environment
+.env.local
+.env
+
+# Build
+dist/
+build/
+
+# Misc
+.DS_Store
+*.log
