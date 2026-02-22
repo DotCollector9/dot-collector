@@ -8,6 +8,10 @@ out/
 # Database (local data — don't commit)
 prisma/dev.db
 prisma/dev.db-journal
+prisma/prisma/
+
+# TypeScript build info
+tsconfig.tsbuildinfo
 
 # Environment
 .env.local
