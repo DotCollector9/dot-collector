@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import { parseCSV, mapLinkedInRows, mapGenericRows, ColumnMapping } from "@/lib/csv-parser";
+
+export const dynamic = "force-dynamic";
 import { geocodeCity } from "@/lib/geocode";
 
 export async function POST(req: NextRequest) {
